@@ -38,6 +38,7 @@ jobs:
           retention-days: 1
 
   release_artifacts:
+    if: startsWith(github.ref, 'refs/tags/')
     needs: build_ubuntu
     name: Release artifacts
     runs-on: ubuntu-latest
@@ -47,6 +48,8 @@ jobs:
         uses: actions/download-artifact@v3
       - name: Test
         run: ls -la
+      - name: Test
+        run: tree
 
   # release_windows:
   #   needs: build_and_test
