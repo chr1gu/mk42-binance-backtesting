@@ -10,25 +10,40 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test_linux:
+  build_and_test:
     name: Ubuntu build
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
       - name: Build
-        run: cargo build --verbose --release --all-features
+        run: cargo build --verbose
       - name: Run tests
         run: cargo test --verbose
 
-  build_windows:
-    name: Windows build
-    runs-on: windows-latest
+  release_linux:
+    needs: build_and_test
+    name: Ubuntu build
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
       - name: Build
         run: cargo build --release --all-features
+      - name: List .
+        run: ls -la
+      - name: List target
+        run: ls -la ./target
+
+  # release_windows:
+  #   needs: build_and_test
+  #   name: Windows build
+  #   runs-on: windows-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Build
+  #       run: cargo build --release --all-features
 
   # linux_arm7:
   #   name: Linux ARMv7
