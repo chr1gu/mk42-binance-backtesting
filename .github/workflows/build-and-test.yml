@@ -49,14 +49,14 @@ jobs:
     steps:
       - name: Download workflow artifacts
         uses: actions/download-artifact@v3
-      - name: Test
-        run: ls -la
-      - name: Test
+      - name: List artifacts
         run: tree
+      - name: Rename Ubuntu release
+        run: mv release-ubuntu/binance-public-data-cli ubuntu-binance-get
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release-ubuntu
+          files: ubuntu-binance-get
 
   # release_windows:
   #   needs: build_and_test
