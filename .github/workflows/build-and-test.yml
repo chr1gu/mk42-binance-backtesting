@@ -49,11 +49,11 @@ jobs:
           path: "*.zip"
           retention-days: 1
 
-  build_linux:
+  build_windows:
     if: startsWith(github.ref, 'refs/tags/')
     needs: build_and_test
-    name: Linux Build
-    runs-on: ubuntu-latest
+    name: Windows Build
+    runs-on: windows-latest
 
     steps:
       - id: get_version
@@ -62,21 +62,43 @@ jobs:
       - name: Build
         run: cargo build --release --all-features
       - name: Zip archive
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r binance-get_${{ steps.get_version.outputs.version-without-v }}_linux.zip target/release/binance-public-data-cli
+        run: Compress-Archive target/release/binance-public-data-cli binance-get_${{ steps.get_version.outputs.version-without-v }}_windows64.zip
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: release-linux
+          name: release-windows
           path: "*.zip"
           retention-days: 1
+
+  # build_linux:
+  #   if: startsWith(github.ref, 'refs/tags/')
+  #   needs: build_and_test
+  #   name: Linux Build
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - id: get_version
+  #       uses: battila7/get-version-action@v2
+  #     - uses: actions/checkout@v3
+  #     - name: Build
+  #       run: cargo build --release --all-features
+  #     - name: Zip archive
+  #       uses: montudor/action-zip@v1
+  #       with:
+  #         args: zip -qq -r binance-get_${{ steps.get_version.outputs.version-without-v }}_linux.zip target/release/binance-public-data-cli
+  #     - name: Upload build artifact
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: release-linux
+  #         path: "*.zip"
+  #         retention-days: 1
 
   release_artifacts:
     if: startsWith(github.ref, 'refs/tags/')
     needs:
-      - build_linux
+      # - build_linux
       - build_macos
+      - build_windows
     name: Release artifacts
     runs-on: ubuntu-latest
 

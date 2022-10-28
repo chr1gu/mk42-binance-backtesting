@@ -5,5 +5,6 @@ Easily download [Binance Public Data](https://github.com/binance/binance-public-
 ## Creating a new release
 
 ```
-git tag -a
+git tag -a v0.0.1
+git push --tags
 ```
