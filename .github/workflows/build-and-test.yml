@@ -1,6 +1,6 @@
 name: Build and Test
 
-on: push
+# on: push
 
 # on:
 #   push:
@@ -51,24 +51,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - id: get_version
+        uses: battila7/get-version-action@v2
       - uses: actions/checkout@v3
       - name: Build
         run: cargo build --release --all-features
       - name: Zip archive
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r release-ubuntu.zip target/release/binance-public-data-cli
+          args: zip -qq -r binance-get_${{ steps.get_version.outputs.version-without-v }}_linux.zip target/release/binance-public-data-cli
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: release-ubuntu
-          path: release-ubuntu.zip
+          name: release-linux
+          path: "*.zip"
           retention-days: 1
 
   release_artifacts:
     if: startsWith(github.ref, 'refs/tags/')
     needs:
-      - build_ubuntu
+      - build_linux
       - build_macos
     name: Release artifacts
     runs-on: ubuntu-latest
@@ -81,30 +83,4 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "*.zip"
-
-  # release_windows:
-  #   needs: build_and_test
-  #   name: Windows build
-  #   runs-on: windows-latest
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Build
-  #       run: cargo build --release --all-features
-
-  # linux_arm7:
-  #   name: Linux ARMv7
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         target: armv7-unknown-linux-gnueabihf
-  #         override: true
-  #     - uses: actions-rs/cargo@v1
-  #       with:
-  #         use-cross: true
-  #         command: build
-  #         args: --target armv7-unknown-linux-gnueabihf
+          files: "**/*.zip"
