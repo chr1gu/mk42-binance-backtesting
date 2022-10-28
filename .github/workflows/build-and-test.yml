@@ -34,14 +34,13 @@ jobs:
       - name: Build
         run: cargo build --release --all-features
       - name: Zip archive
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r release-macos.zip target/release/binance-public-data-cli
+        uses: battila7/get-version-action@v2
+        run: zip -r -j -X binance-get_${{ steps.get_version.outputs.version-without-v }}_mac.zip target/release/binance-public-data-cli
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: release-macos
-          path: release-macos.zip
+          path: "*.zip"
           retention-days: 1
 
   build_ubuntu:
