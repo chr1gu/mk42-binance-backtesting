@@ -26,7 +26,7 @@ jobs:
   build_macos:
     if: startsWith(github.ref, 'refs/tags/')
     needs: build_and_test
-    name: macOS release build
+    name: macOS Build
     runs-on: macos-latest
 
     steps:
@@ -34,7 +34,6 @@ jobs:
       - name: Build
         run: cargo build --release --all-features
       - name: Zip archive
-        uses: battila7/get-version-action@v2
         run: zip -r -j -X binance-get_${{ steps.get_version.outputs.version-without-v }}_mac.zip target/release/binance-public-data-cli
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
@@ -46,7 +45,7 @@ jobs:
   build_ubuntu:
     if: startsWith(github.ref, 'refs/tags/')
     needs: build_and_test
-    name: Ubuntu release build
+    name: Ubuntu Build
     runs-on: ubuntu-latest
 
     steps:
