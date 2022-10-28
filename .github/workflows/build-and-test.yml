@@ -49,10 +49,10 @@ jobs:
           path: "*.zip"
           retention-days: 1
 
-  build_ubuntu:
+  build_linux:
     if: startsWith(github.ref, 'refs/tags/')
     needs: build_and_test
-    name: Ubuntu Build
+    name: Linux Build
     runs-on: ubuntu-latest
 
     steps:
