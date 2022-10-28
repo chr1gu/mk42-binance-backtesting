@@ -64,7 +64,7 @@ jobs:
       - name: Test
         run: ls
       - name: Zip archive
-        run: Compress-Archive target/release/binance-public-data-cli binance-get_${{ steps.get_version.outputs.version-without-v }}_windows64.zip
+        run: Compress-Archive binance-public-data-cli binance-get_${{ steps.get_version.outputs.version-without-v }}_windows64.zip
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
