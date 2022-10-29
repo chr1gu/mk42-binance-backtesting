@@ -2,7 +2,11 @@
 
 Easily download [Binance Public Data](https://github.com/binance/binance-public-data) 💪
 
-## Creating a new release
+## Development
+
+Run `cargo r` to compile and run the package.
+
+### New release
 
 ```
 git tag -a v0.0.1

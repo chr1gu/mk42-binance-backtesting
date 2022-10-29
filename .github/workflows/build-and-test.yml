@@ -41,7 +41,7 @@ jobs:
       - name: Build
         run: cargo build --release --all-features
       - name: Zip archive
-        run: zip -r -j -X binance-get_${{ steps.get_version.outputs.version-without-v }}_mac.zip target/release/binance-public-data-cli
+        run: zip -r -j -X binance-get_${{ steps.get_version.outputs.version-without-v }}_mac.zip target/release/binance-get
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
@@ -64,7 +64,7 @@ jobs:
       - name: Test
         run: ls target/release
       - name: Zip archive
-        run: Compress-Archive target/release/binance-public-data-cli.exe binance-get_${{ steps.get_version.outputs.version-without-v }}_windows64.zip
+        run: Compress-Archive target/release/binance-get.exe binance-get_${{ steps.get_version.outputs.version-without-v }}_windows64.zip
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
@@ -87,7 +87,7 @@ jobs:
   #     - name: Zip archive
   #       uses: montudor/action-zip@v1
   #       with:
-  #         args: zip -qq -r binance-get_${{ steps.get_version.outputs.version-without-v }}_linux.zip target/release/binance-public-data-cli
+  #         args: zip -qq -r binance-get_${{ steps.get_version.outputs.version-without-v }}_linux.zip target/release/binance-get
   #     - name: Upload build artifact
   #       uses: actions/upload-artifact@v3
   #       with:

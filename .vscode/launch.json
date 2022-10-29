@@ -1,0 +1,41 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'binance-get'",
+      "cargo": {
+        "args": ["build", "--bin=binance-get", "--package=binance-get"],
+        "filter": {
+          "name": "binance-get",
+          "kind": "bin"
+        }
+      },
+      "args": ["./download"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'binance-get'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=binance-get",
+          "--package=binance-get"
+        ],
+        "filter": {
+          "name": "binance-get",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
