@@ -1,7 +1,6 @@
 use crate::types;
 use serde_xml_rs::from_str;
 use std::io::Read;
-use urlencoding::encode;
 
 pub fn get_symbols() -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let mut is_fetching = true;
@@ -17,7 +16,7 @@ pub fn get_symbols() -> Result<Vec<String>, Box<dyn std::error::Error>> {
 
         let doc: types::SymbolResult = from_str(&body).unwrap();
         if let Some(marker) = doc.next_marker {
-            next_marker = encode(&marker).to_string();
+            next_marker = marker;
         } else {
             is_fetching = false;
         }

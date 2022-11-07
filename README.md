@@ -4,7 +4,8 @@ Easily download [Binance Public Data](https://github.com/binance/binance-public-
 
 ## Development
 
-Run `cargo r` to compile and run the package.
+Run `cargo r` to compile and run the package with default settings.
+Run e.g. `cargo r --release -- --start-date 2021-03-01 --end-date 2022-01-01 --symbol USDT$ --interval 1m ./target` with custom settings.
 
 ### New release
 

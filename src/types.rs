@@ -12,7 +12,7 @@ pub struct SymbolResult {
 #[serde(rename_all = "PascalCase")]
 pub struct KlineResult {
     pub next_marker: Option<String>,
-    pub contents: Vec<Contents>,
+    pub contents: Option<Vec<Contents>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
