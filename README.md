@@ -1,4 +1,4 @@
-# Binance Public Data CLI
+# Binance Public Data Downloader
 
 Easily download [Binance Public Data](https://github.com/binance/binance-public-data) 💪
 
