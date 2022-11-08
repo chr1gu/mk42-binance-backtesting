@@ -2,6 +2,21 @@
 
 Easily download [Binance Public Data](https://github.com/binance/binance-public-data) 💪
 
+## Getting started
+
+1. Install and build the `binance-get` binary from source using:
+
+```
+cargo install --git https://github.com/chr1gu/binance-public-data-cli
+```
+
+2. Download binance market data example:
+
+```
+mkdir ./binance-market-data
+binance-get --symbol ^BTC --interval 1m ./binance-market-data
+```
+
 ## Development
 
 Run `cargo r` to compile and run the package with default settings.
