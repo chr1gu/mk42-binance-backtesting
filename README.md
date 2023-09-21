@@ -1,26 +1,31 @@
-# Binance Public Data Downloader
+# MK42 Binance Backtesting Tools
 
-Easily download [Binance Public Data](https://github.com/binance/binance-public-data) 💪
+## Fetch: download Binance public data
+
+Use `mk42-binance-backtesting fetch` to easily download [Binance public data](https://github.com/binance/binance-public-data) 💪
 
 ## Getting started
 
-1. Install and build `binance-get` from source:
+1. Install and build `mk42-binance-backtesting` from source:
 
 ```
-cargo install --git https://github.com/chr1gu/binance-public-data-cli
+cargo install --git https://github.com/chr1gu/mk42-binance-backtesting
 ```
 
 2. Example usage:
 
 ```
-mkdir ./binance-market-data
-binance-get --symbol ^BTC --interval 1m ./binance-market-data
+mk42-binance-backtesting fetch --symbol ^BTC --interval 1m ./data
 ```
 
 ## Development
 
-Run `cargo r` to compile and run the package with default settings.
-Run e.g. `cargo r --release -- --start-date 2021-03-01 --end-date 2022-01-01 --symbol USDT$ --interval 1m ./target` with custom settings.
+[Install Rust](https://www.rust-lang.org/tools/install) or update your installation: `rustup update` then
+run e.g. `cargo r --release -- fetch --start-date 2021-03-01 --end-date 2022-01-01 --symbol USDT$ --interval 1m ./data` with custom settings.
+
+### Linting
+
+Run `cargo clippy`
 
 ### New release
 
@@ -28,3 +33,7 @@ Run e.g. `cargo r --release -- --start-date 2021-03-01 --end-date 2022-01-01 --s
 git tag -a v0.0.1
 git push --tags
 ```
+
+## TODOs
+
+- Use anyhow or eyre

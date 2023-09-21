@@ -1,62 +1,34 @@
-use chrono::NaiveDate;
+use anyhow::Result;
 use clap::Parser;
-use colored::Colorize;
-use regex::Regex;
-use std::{panic, process, time::Instant};
-mod cli;
-mod klines;
+use cli::Commands;
+use date::DateString;
+mod fetch_command;
+mod progress;
 mod symbols;
 mod types;
+mod klines;
+mod date;
+mod cli;
 
-fn main() {
-    let time = Instant::now();
+fn main() -> Result<()> {
     let args = cli::Cli::parse();
     if args.version {
-        return println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+        println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
     }
 
-    if !args.continue_on_error {
-        panic::set_hook(Box::new(|panic_info| {
-            println!("{}", panic_info.to_string().red());
-            process::exit(1);
-        }));
+    match args.command {
+        Commands::Fetch { interval, path, shared_args  } => {
+            let start_date = shared_args.start_date.as_date();
+            let end_date = shared_args.end_date.as_date();
+            fetch_command::fetch(interval, shared_args.symbol, start_date, end_date, path, args.verbose)?
+        },
+        Commands::Run { shared_args } => {
+            let start_date = shared_args.start_date.as_date();
+            let end_date = shared_args.end_date.as_date();
+            println!("Hi {:?} {:?}", start_date, end_date)
+        },
     }
 
-    let start_date = if let Some(start_date) = &args.start_date {
-        Some(NaiveDate::parse_from_str(start_date, "%Y-%m-%d").unwrap())
-    } else {
-        None
-    };
-
-    let end_date = if let Some(end_date) = args.end_date {
-        Some(NaiveDate::parse_from_str(&end_date, "%Y-%m-%d").unwrap())
-    } else {
-        None
-    };
-
-    let all_symbols = symbols::get_symbols().unwrap();
-    if args.list_symbols {
-        return println!("{}", all_symbols.join(", "));
-    }
-
-    let symbol_filter = Regex::new(&args.symbol).unwrap();
-    let symbols: Vec<String> = all_symbols
-        .iter()
-        .filter(|s| symbol_filter.is_match(s))
-        .map(|s| s.to_owned())
-        .collect();
-
-    println!("{} symbols found: {}", symbols.len(), symbols.join(", "));
-    symbols.iter().for_each(|symbol| {
-        klines::get_klines(
-            symbol,
-            &args.interval,
-            &start_date,
-            &end_date,
-            &args.path,
-            &args.force,
-        );
-    });
-
-    println!("Finished after {:.2?}", time.elapsed(),);
+    Ok(())
 }
+

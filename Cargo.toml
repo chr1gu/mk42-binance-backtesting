@@ -1,19 +1,26 @@
 [package]
-name = "binance-get"
+name = "mk42-binance-backtesting"
 version = "0.0.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.0.18", features = ["derive"] }
-reqwest = { version = "0.11.12", features = ["blocking"] }
-tempfile = { version = "3.3.0"}
-csv = { version = "1.1"}
-regex = { version = "1"}
-colored = { version = "2.0.0" }
-zip = { version = "0.6.3" }
+clap = { version = "4.4.4", features = ["derive"] }
+reqwest = { version = "0.11.20", features = ["blocking"] }
+tempfile = { version = "3.8.0"}
+csv = { version = "1.2.2"}
+regex = { version ="1.9.5"}
+colored = { version = "2.0.4" }
+zip = { version = "0.6.6" }
 serde-xml-rs = { version = "0.6.0" }
-serde = { version = "1.0.147", features = ["derive"] }
-chrono = { version = "0.4.19", features = ["serde"]}
-rayon = { version = "1.5.3"}
+serde = { version = "1.0.188", features = ["derive"] }
+chrono = { version = "0.4.31", features = ["serde"]}
+rayon = { version = "1.8.0"}
+indicatif = "0.17.6"
+crossbeam = "0.8.2"
+log = "0.4.20"
+indicatif-log-bridge = "0.2.2"
+env_logger = "0.10.0"
+clap-verbosity-flag = "2.0.1"
+anyhow = "1.0.75"

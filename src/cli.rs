@@ -1,21 +1,52 @@
-use clap::Parser;
+use clap::{Parser, Subcommand, Args};
+use clap_verbosity_flag::{Verbosity, InfoLevel};
 
-#[derive(Parser)]
+
+#[derive(Debug, Parser)]
+#[command(about = "A fictional versioning CLI", long_about = None)]
 pub struct Cli {
-    /// The output directory to store the files
-    pub path: std::path::PathBuf,
+    #[command(subcommand)]
+    pub command: Commands,
 
-    /// The interval
-    #[arg(short, long, default_value_t = format!("1m"))]
-    pub interval: String,
+    /// Print version info and exit
+    #[arg(short('V'), long, default_value_t = false)]
+    pub version: bool,
 
+    /// Print available symbols and exit
+    #[arg(short, long, default_value_t = false)]
+    pub list_symbols: bool,
+
+    #[command(flatten)]
+    pub verbose: Verbosity<InfoLevel>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum Commands {
+    #[command(arg_required_else_help = true)]
+    Fetch {
+        /// The output directory to store the files
+        path: std::path::PathBuf,
+
+        /// The interval
+        #[arg(short, long, default_value_t = format!("1m"))]
+        interval: String,
+
+        #[command(flatten)]
+        shared_args: SharedArguments,
+    },
+
+    #[command(arg_required_else_help = true)]
+    Run {
+        #[command(flatten)]
+        shared_args: SharedArguments,
+    }
+}
+
+#[derive(Args, Debug, Clone)]
+pub struct SharedArguments {
     /// The symbol name or Regex filter
     #[arg(short, long, default_value_t = format!(".*"))]
     pub symbol: String,
-
-    /// Force override existing files
-    #[arg(short, long, default_value_t = false)]
-    pub force: bool,
 
     /// Optional: start date (format: YYYY-MM-DD)
     #[arg(long)]
@@ -24,16 +55,4 @@ pub struct Cli {
     /// Optional: end date (format: YYYY-MM-DD)
     #[arg(long)]
     pub end_date: Option<String>,
-
-    /// Print available symbols and exit
-    #[arg(short, long, default_value_t = false)]
-    pub list_symbols: bool,
-
-    /// Continue fetching data if a request fails for some reason
-    #[arg(long, default_value_t = false)]
-    pub continue_on_error: bool,
-
-    /// Print version info and exit
-    #[arg(short('V'), long, default_value_t = false)]
-    pub version: bool,
 }

@@ -16,7 +16,8 @@
         }
       },
       "args": [
-        "--symbol=BTCUSDT",
+        "fetch",
+        "--symbol=USDT$",
         "--interval=1m",
         "--start-date=2021-03-01",
         "--end-date=2022-08-01",

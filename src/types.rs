@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -8,7 +10,7 @@ pub struct SymbolResult {
     pub common_prefixes: Vec<CommonPrefixes>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "PascalCase")]
 pub struct KlineResult {
     pub next_marker: Option<String>,
@@ -21,8 +23,13 @@ pub struct CommonPrefixes {
     pub prefix: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "PascalCase")]
 pub struct Contents {
     pub key: String,
+}
+
+pub struct KlineArchive {
+    pub target_directory: PathBuf,
+    pub temp_file_path: PathBuf,
 }
