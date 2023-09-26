@@ -6,7 +6,10 @@ use std::io::Read;
 
 use crate::types;
 
-pub fn fetch(symbol_sender: &Sender<String>, symbol_filter: String) -> Result<(), Box<dyn std::error::Error>> {
+pub fn fetch(
+    symbol_sender: &Sender<String>,
+    symbol_filter: String,
+) -> Result<(), Box<dyn std::error::Error>> {
     let mut is_fetching = true;
     let mut next_marker: String = String::new();
 

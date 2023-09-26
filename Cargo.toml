@@ -9,7 +9,7 @@ edition = "2021"
 clap = { version = "4.4.4", features = ["derive"] }
 reqwest = { version = "0.11.20", features = ["blocking"] }
 tempfile = { version = "3.8.0"}
-csv = { version = "1.2.2"}
+csv = "1.2.2"
 regex = { version ="1.9.5"}
 colored = { version = "2.0.4" }
 zip = { version = "0.6.6" }
@@ -24,3 +24,4 @@ indicatif-log-bridge = "0.2.2"
 env_logger = "0.10.0"
 clap-verbosity-flag = "2.0.1"
 anyhow = "1.0.75"
+ta = "0.5.0"

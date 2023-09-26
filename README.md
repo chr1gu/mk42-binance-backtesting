@@ -20,12 +20,13 @@ mk42-binance-backtesting fetch --symbol ^BTC --interval 1m ./data
 
 ## Development
 
-[Install Rust](https://www.rust-lang.org/tools/install) or update your installation: `rustup update` then
-run e.g. `cargo r --release -- fetch --start-date 2021-03-01 --end-date 2022-01-01 --symbol USDT$ --interval 1m ./data` with custom settings.
+- Update toolchain: [Install Rust](https://www.rust-lang.org/tools/install) or update your installation with `rustup update`.
+- Build and fetch data: `cargo r --release -- fetch --start-date 2021-03-01 --end-date 2022-01-01 --symbol USDT$ --interval 1m ./data`
+- Build and test with data: `cargo r --release -- test --start-date 2021-03-01 --end-date 2022-01-01 --symbol "BTCUSDT|XRPUSDT" ./data`
 
 ### Linting
 
-Run `cargo clippy`
+Run `cargo clippy` or `cargo clippy --fix --bin "mk42-binance-backtesting"` to find and fix obvious issues.
 
 ### New release
 

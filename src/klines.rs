@@ -1,13 +1,23 @@
+use crate::{
+    date::DateString,
+    types::{self, KlineArchive},
+};
 use anyhow::Result;
 use chrono::NaiveDate;
-use crate::{types::{self, KlineArchive}, date::DateString};
 use crossbeam::channel::Sender;
+use csv::StringRecord;
 use log::debug;
 use regex::Regex;
+use serde::Deserialize;
 use serde_xml_rs::from_str;
-use std::{io::Read, path::{PathBuf, Path}, env, fs::File};
+use std::{
+    env,
+    fs::File,
+    io::Read,
+    path::{Path, PathBuf},
+};
 
-pub fn fetch_urls (
+pub fn fetch_urls(
     symbol: &str,
     interval: &str,
     kline_url_sender: &Sender<String>,
@@ -28,22 +38,27 @@ pub fn fetch_urls (
 
         let doc: types::KlineResult = from_str(&body).unwrap();
         if let Some(contents) = doc.contents {
-            contents.iter().filter(|content| content.key.ends_with(".zip")).for_each(|item| {
-                let path = &item.key;
-                let regex = Regex::new(r"(?P<date>\d{4}-\d{2}-\d{2})\.zip$").unwrap();
-                let Some(captures) = regex.captures(path) else {
-                    panic!("{}", format!("Can't parse date: {url}"));
-                };
+            contents
+                .iter()
+                .filter(|content| content.key.ends_with(".zip"))
+                .for_each(|item| {
+                    let path = &item.key;
+                    let regex = Regex::new(r"(?P<date>\d{4}-\d{2}-\d{2})\.zip$").unwrap();
+                    let Some(captures) = regex.captures(path) else {
+                        panic!("{}", format!("Can't parse date: {url}"));
+                    };
 
-                let date = &captures.name("date").unwrap().as_str().as_date().unwrap();
-                if start_date.is_some_and(|start_date| date < &start_date) || end_date.is_some_and(|end_date| date > &end_date) {
-                    // ignore urls that are not within the provided start and end dates
-                    return;
-                }
+                    let date = &captures.name("date").unwrap().as_str().parse_date();
+                    if start_date.is_some_and(|start_date| date < &start_date)
+                        || end_date.is_some_and(|end_date| date > &end_date)
+                    {
+                        // ignore urls that are not within the provided start and end dates
+                        return;
+                    }
 
-                let kline_url = format!("https://data.binance.vision/{path}");
-                kline_url_sender.send(kline_url).unwrap();
-            });
+                    let kline_url = format!("https://data.binance.vision/{path}");
+                    kline_url_sender.send(kline_url).unwrap();
+                });
         }
 
         if let Some(marker) = doc.next_marker {
@@ -56,7 +71,7 @@ pub fn fetch_urls (
     Ok(())
 }
 
-pub fn download_klines (
+pub fn download_klines(
     url: &str,
     kline_download_sender: &Sender<KlineArchive>,
     data_dir: &Path,
@@ -89,15 +104,17 @@ pub fn download_klines (
         .copy_to(&mut temp_file)
         .unwrap();
 
-    kline_download_sender.send(KlineArchive {
-        target_directory: target_path.parent().unwrap().to_path_buf(),
-        temp_file_path, 
-    }).unwrap();
+    kline_download_sender
+        .send(KlineArchive {
+            target_directory: target_path.parent().unwrap().to_path_buf(),
+            temp_file_path,
+        })
+        .unwrap();
 
     Ok(())
 }
 
-pub fn extract_klines (
+pub fn extract_klines(
     temp_file_path: PathBuf,
     target_directory: PathBuf,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -106,6 +123,37 @@ pub fn extract_klines (
     zip.extract(&target_directory)?;
 
     let names: Vec<&str> = zip.file_names().collect();
-    debug!("Extracted {:?} into {}", names, target_directory.to_str().unwrap());
+    debug!(
+        "Extracted {:?} into {}",
+        names,
+        target_directory.to_str().unwrap()
+    );
     Ok(())
+}
+
+pub fn csv_headers() -> StringRecord {
+    // https://github.com/binance/binance-public-data/
+    StringRecord::from(vec![
+        "open_time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "close_time",
+        "quote_asset_volume",
+        "number_of_trades",
+        "taker_buy_base_asset_volume",
+        "taker_buy_quote_asset_volume",
+    ])
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Kline {
+    pub open_time: i64,
+    pub open: f64,
+    pub high: f64,
+    pub low: f64,
+    pub close: f64,
+    pub volume: f64,
 }

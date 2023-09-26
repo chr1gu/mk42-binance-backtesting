@@ -1,6 +1,5 @@
-use clap::{Parser, Subcommand, Args};
-use clap_verbosity_flag::{Verbosity, InfoLevel};
-
+use clap::{Parser, Subcommand};
+use clap_verbosity_flag::{InfoLevel, Verbosity};
 
 #[derive(Debug, Parser)]
 #[command(about = "A fictional versioning CLI", long_about = None)]
@@ -27,32 +26,38 @@ pub enum Commands {
         /// The output directory to store the files
         path: std::path::PathBuf,
 
+        /// The symbol name or Regex filter
+        #[arg(short, long, default_value_t = format!(".*"))]
+        symbol: String,
+
         /// The interval
         #[arg(short, long, default_value_t = format!("1m"))]
         interval: String,
 
-        #[command(flatten)]
-        shared_args: SharedArguments,
+        /// Optional: start date (format: YYYY-MM-DD)
+        #[arg(long)]
+        start_date: Option<String>,
+
+        /// Optional: end date (format: YYYY-MM-DD)
+        #[arg(long)]
+        end_date: Option<String>,
     },
 
     #[command(arg_required_else_help = true)]
-    Run {
-        #[command(flatten)]
-        shared_args: SharedArguments,
-    }
-}
+    Test {
+        /// The symbol name or Regex filter
+        #[arg(short, long, default_value_t = format!(".*"))]
+        symbol: String,
 
-#[derive(Args, Debug, Clone)]
-pub struct SharedArguments {
-    /// The symbol name or Regex filter
-    #[arg(short, long, default_value_t = format!(".*"))]
-    pub symbol: String,
+        /// Start date (format: YYYY-MM-DD)
+        #[arg(long)]
+        start_date: String,
 
-    /// Optional: start date (format: YYYY-MM-DD)
-    #[arg(long)]
-    pub start_date: Option<String>,
+        /// End date (format: YYYY-MM-DD)
+        #[arg(long)]
+        end_date: String,
 
-    /// Optional: end date (format: YYYY-MM-DD)
-    #[arg(long)]
-    pub end_date: Option<String>,
+        /// The output directory to store the files
+        path: std::path::PathBuf,
+    },
 }
