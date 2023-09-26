@@ -45,7 +45,6 @@ fn main() -> Result<()> {
             let start_date = start_date.parse_date();
             let end_date = end_date.parse_date();
             test_command::test(symbol_regex, start_date, end_date, path, args.verbose)?;
-            return Ok(());
         }
     }
 

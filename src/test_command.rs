@@ -35,10 +35,10 @@ pub fn test(
         .unwrap();
 
     let duration = end_date.signed_duration_since(start_date).num_days() as u64;
-    let progress_bar = ProgressBar::new(duration);
+    let progress_bar = progress.add(ProgressBar::new(duration));
     progress_bar.set_style(
         ProgressStyle::with_template(
-            "{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} ({eta})",
+            "{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} days ({eta})",
         )
         .unwrap()
         .with_key("eta", |state: &ProgressState, w: &mut dyn Write| {
@@ -99,6 +99,7 @@ pub fn test(
         progress_bar.inc(1);
     }
 
+    progress_bar.finish_and_clear();
     let mut total_performance = 0.0;
     let mut total_updates = 0;
     let mut total_symbols = 0;
