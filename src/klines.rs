@@ -157,3 +157,15 @@ pub struct Kline {
     pub close: f64,
     pub volume: f64,
 }
+
+impl ta::Close for Kline {
+    fn close(&self) -> f64 {
+        self.close
+    }
+}
+
+impl ta::Volume for Kline {
+    fn volume(&self) -> f64 {
+        self.volume
+    }
+}

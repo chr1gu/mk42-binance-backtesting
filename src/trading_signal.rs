@@ -4,8 +4,14 @@ use crate::klines::Kline;
 use anyhow::Ok;
 use chrono::NaiveDateTime;
 use colored::Colorize;
-use log::info;
-use ta::{indicators::SimpleMovingAverage, Next};
+use log::debug;
+use ta::{
+    indicators::{
+        MovingAverageConvergenceDivergence, OnBalanceVolume, RelativeStrengthIndex,
+        SimpleMovingAverage,
+    },
+    Next,
+};
 
 pub struct TradingStatistics {
     pub performance: f64,
@@ -29,6 +35,11 @@ pub struct TradingSignal {
     pub sma50: SimpleMovingAverage,
     pub sma200: SimpleMovingAverage,
     pub sma201: SimpleMovingAverage,
+    pub sma1440: SimpleMovingAverage,
+    pub sma10080: SimpleMovingAverage,
+    pub macd: MovingAverageConvergenceDivergence,
+    pub obv: OnBalanceVolume,
+    pub rsi: RelativeStrengthIndex,
     pub current_buy_price: Option<f64>,
     pub latest_buy_timestamp: Option<NaiveDateTime>,
     pub latest_sell_timestamp: Option<NaiveDateTime>,
@@ -70,6 +81,11 @@ impl TradingSignal {
             sma50: SimpleMovingAverage::new(50).unwrap(),
             sma200: SimpleMovingAverage::new(200).unwrap(),
             sma201: SimpleMovingAverage::new(201).unwrap(),
+            sma1440: SimpleMovingAverage::new(1440).unwrap(),
+            sma10080: SimpleMovingAverage::new(10080).unwrap(),
+            macd: MovingAverageConvergenceDivergence::new(34, 144, 9).unwrap(),
+            obv: OnBalanceVolume::new(),
+            rsi: RelativeStrengthIndex::new(14).unwrap(),
             current_buy_price: None,
             latest_buy_timestamp: None,
             latest_sell_timestamp: None,
@@ -83,26 +99,49 @@ impl TradingSignal {
         let sma50 = self.sma50.next(kline.close);
         let sma200 = self.sma200.next(kline.close);
         let sma201 = self.sma201.next(kline.close);
+        let sma1440 = self.sma1440.next(kline.close);
+        let sma10080 = self.sma10080.next(kline.close);
+        let macd = self.macd.next(kline.close);
+        let obv = self.obv.next(&kline);
+        let rsi = self.rsi.next(&kline);
+
         let timestamp = NaiveDateTime::from_timestamp_opt(kline.open_time / 1000, 0)
             .expect("Invalid timestamp");
         let trading_fee = 0.1;
+
         self.latest_close = Some(kline.close);
         self.stats.updates += 1;
 
         // buy logic
         if self.current_buy_price.is_none()
-            && self.stats.updates >= 200
+            && self.stats.updates >= 201
             && kline.close > sma9
             && sma9 > sma26
             && sma26 > sma50
             && sma50 > sma200
             && sma200 > sma201
+        // && sma200 > sma1440
+        // && sma1440 > sma10080
+        && rsi > 80.0
+        // && obv < 0.0
+        // && macd.histogram > 0.0
         {
             // info!("Buy {} for {}", self.symbol.name.yellow(), kline.close);
             self.current_buy_price = Some(kline.close);
             self.latest_buy_timestamp = Some(timestamp);
             self.stats.performance -= trading_fee;
             self.stats.total_buys += 1;
+            if self.latest_close.is_some_and(|c| c > kline.close) {
+                debug!(
+                    "BUY with trend: ↓ {}, macd histogram: {}, obv: {}",
+                    kline.close, macd.histogram, obv
+                );
+            } else {
+                debug!(
+                    "BUY with trend: ↑ {}, macd histogram: {}, obv: {}",
+                    kline.close, macd.histogram, obv
+                );
+            }
             return Ok(());
         }
 
@@ -123,7 +162,7 @@ impl TradingSignal {
             let label = "SELL".green();
             let symbol = self.symbol.name.yellow();
             let close = kline.close;
-            info!("{label} {symbol} for {close} (bought at {current_buy_price})");
+            debug!("{label} {symbol} for {close} (bought at {current_buy_price})");
             self.stats.performance += 5.0;
             self.stats.performance -= trading_fee;
             self.stats.total_fee += trading_fee;
@@ -141,7 +180,7 @@ impl TradingSignal {
             let label = "STOP-LOSS SELL (age)".red();
             let symbol = self.symbol.name.yellow();
             let close = kline.close;
-            info!(
+            debug!(
                 "{label} {symbol} for {close} (bought at {current_buy_price}, {}%)",
                 price_change
             );
@@ -190,14 +229,14 @@ impl TradingSignal {
         if price_change > 0.0 {
             let label = "SELL (finalize)".green();
             self.stats.total_profitable_sells += 1;
-            info!(
+            debug!(
                 "{label} {symbol} for {latest_close} (bought at {current_buy_price}, {}%)",
                 price_change
             );
         } else {
             let label = "STOP-LOSS SELL (finalize)".red();
             self.stats.total_stoploss_sells += 1;
-            info!(
+            debug!(
                 "{label} {symbol} for {latest_close} (bought at {current_buy_price}, {}%)",
                 price_change
             );

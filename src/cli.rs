@@ -60,4 +60,22 @@ pub enum Commands {
         /// The output directory to store the files
         path: std::path::PathBuf,
     },
+
+    #[command(arg_required_else_help = true)]
+    TestVariants {
+        /// The symbol name or Regex filter
+        #[arg(short, long, default_value_t = format!(".*"))]
+        symbol: String,
+
+        /// Start date (format: YYYY-MM-DD)
+        #[arg(long)]
+        start_date: String,
+
+        /// End date (format: YYYY-MM-DD)
+        #[arg(long)]
+        end_date: String,
+
+        /// The output directory to store the files
+        path: std::path::PathBuf,
+    },
 }

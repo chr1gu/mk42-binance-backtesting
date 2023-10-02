@@ -4,11 +4,11 @@ use crate::{
 };
 use anyhow::{Ok, Result};
 use chrono::{Duration, NaiveDate};
-use clap_verbosity_flag::{InfoLevel, Verbosity};
+
 use colored::Colorize;
 use csv::Reader;
 use indicatif::{MultiProgress, ProgressBar, ProgressState, ProgressStyle};
-use indicatif_log_bridge::LogWrapper;
+
 use log::{debug, info};
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
 use regex::Regex;
@@ -20,25 +20,18 @@ use std::{
 };
 
 pub fn test(
-    symbol_filter: Regex,
-    start_date: NaiveDate,
-    end_date: NaiveDate,
+    symbol_filter: &Regex,
+    start_date: &NaiveDate,
+    end_date: &NaiveDate,
     data_dir: PathBuf,
-    verbosity: Verbosity<InfoLevel>,
+    progress: &MultiProgress,
 ) -> Result<f64> {
-    let progress = MultiProgress::new();
-    let logger = env_logger::Builder::new()
-        .filter_level(verbosity.log_level_filter())
-        .build();
-    LogWrapper::new(progress.clone(), logger)
-        .try_init()
-        .unwrap();
-
-    let duration = end_date.signed_duration_since(start_date).num_days() as u64;
+    let duration = end_date.signed_duration_since(*start_date).num_days() as u64;
     let progress_bar = progress.add(ProgressBar::new(duration));
+    progress_bar.set_message(format!("{start_date} to {end_date}"));
     progress_bar.set_style(
         ProgressStyle::with_template(
-            "{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} days ({eta})",
+            "{spinner:.green} [{elapsed_precise}] {msg} [{wide_bar:.cyan/blue}] {pos}/{len} days ({eta})",
         )
         .unwrap()
         .with_key("eta", |state: &ProgressState, w: &mut dyn Write| {
@@ -50,8 +43,8 @@ pub fn test(
     let mut signals_by_symbol: HashMap<String, TradingSignal> = HashMap::new();
     let symbol_path_regex = Regex::new(r"(?P<symbol>\w+)-1m").unwrap();
 
-    let mut day = start_date;
-    while day <= end_date {
+    let mut day = start_date.to_owned();
+    while day <= *end_date {
         debug!("Processing {:?}", day);
 
         let dir = data_dir.join(day.format("%Y/%m/%d").to_string());
@@ -100,6 +93,7 @@ pub fn test(
     }
 
     progress_bar.finish_and_clear();
+
     let mut total_performance = 0.0;
     let mut total_updates = 0;
     let mut total_symbols = 0;
@@ -125,7 +119,7 @@ pub fn test(
         total_updates += signal.stats.updates;
         total_performance += signal.stats.performance;
         total_trades += signal.stats.total_sells;
-        info!("{}", signal);
+        debug!("{}", signal);
     });
 
     let updates = total_updates
@@ -144,7 +138,7 @@ pub fn test(
         format!("{}%", total_performance.round()).red()
     };
 
-    info!("{total_symbols} Symbols discovered and {updates} klines processed.",);
-    info!("Total performance: {performance}, trades: {total_trades}");
+    debug!("{total_symbols} Symbols discovered and {updates} klines processed.",);
+    info!("Performance from {start_date} to {end_date}: {performance}, trades: {total_trades}");
     Ok(total_performance)
 }
