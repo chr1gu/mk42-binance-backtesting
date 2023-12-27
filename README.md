@@ -18,6 +18,16 @@ cargo install --git https://github.com/chr1gu/mk42-binance-backtesting
 mk42-binance-backtesting fetch --symbol ^BTC --interval 1m ./data
 ```
 
+# Visualize
+
+docker run --rm -it -p 3000:3000 --name=grafana \
+ --user "$(id -u)" \
+ --volume "$PWD/grafana/data:/var/lib/grafana" \
+ --volume "$PWD/data:/data" \
+ grafana/grafana-oss
+
+> Open http://localhost:3000/
+
 ## Development
 
 - Update toolchain: [Install Rust](https://www.rust-lang.org/tools/install) or update your installation with `rustup update`.
