@@ -21,6 +21,7 @@ mod symbols;
 mod test_command;
 mod trading_signal;
 mod types;
+mod visualize_command;
 
 fn main() -> Result<()> {
     let start = Instant::now();
@@ -59,6 +60,17 @@ fn main() -> Result<()> {
             let start_date = start_date.parse_date();
             let end_date = end_date.parse_date();
             test_command::test(&symbol_regex, &start_date, &end_date, path, &progress)?;
+        }
+        Commands::Visualize {
+            symbol,
+            path,
+            start_date,
+            end_date,
+        } => {
+            let symbol_regex = Regex::new(&symbol).unwrap();
+            let start_date = start_date.parse_date();
+            let end_date = end_date.parse_date();
+            visualize_command::visualize(&symbol_regex, &start_date, &end_date, path, &progress)?;
         }
         Commands::TestVariants {
             symbol,

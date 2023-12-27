@@ -57,7 +57,7 @@ pub enum Commands {
         #[arg(long)]
         end_date: String,
 
-        /// The output directory to store the files
+        /// The input directory to read the files from
         path: std::path::PathBuf,
     },
 
@@ -75,7 +75,25 @@ pub enum Commands {
         #[arg(long)]
         end_date: String,
 
-        /// The output directory to store the files
+        /// The input directory to read the files from
+        path: std::path::PathBuf,
+    },
+
+    #[command(arg_required_else_help = true)]
+    Visualize {
+        /// The symbol name or Regex filter
+        #[arg(short, long, default_value_t = format!(".*"))]
+        symbol: String,
+
+        /// Start date (format: YYYY-MM-DD)
+        #[arg(long)]
+        start_date: String,
+
+        /// End date (format: YYYY-MM-DD)
+        #[arg(long)]
+        end_date: String,
+
+        /// The input directory to read the files from
         path: std::path::PathBuf,
     },
 }
