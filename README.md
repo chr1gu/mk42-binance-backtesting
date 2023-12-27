@@ -20,13 +20,26 @@ mk42-binance-backtesting fetch --symbol ^BTC --interval 1m ./data
 
 # Visualize
 
+## Grafana
+
 docker run --rm -it -p 3000:3000 --name=grafana \
  --user "$(id -u)" \
- --volume "$PWD/grafana/data:/var/lib/grafana" \
- --volume "$PWD/data:/data" \
+ -v "$PWD/grafana/data:/var/lib/grafana" \
+ -v "$PWD/data:/data" \
  grafana/grafana-oss
 
 > Open http://localhost:3000/
+> admin / admin
+
+## InfluxDB
+
+docker run --rm -it -p 8083:8083 -p 8086:8086 \
+ --user "$(id -u)" \
+ -v "$PWD/influxdb/data:/var/lib/influxdb2" \
+ influxdb
+
+> Open http://localhost:8086/
+> admin / admin123
 
 ## Development
 
